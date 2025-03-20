@@ -5,9 +5,9 @@ import org.openqa.selenium.By;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +50,7 @@ public class StocksController {
         System.out.println("Data Scraping finished");
     }
 
+    @CrossOrigin(origins = "http://localhost:8100")
     @GetMapping("/getData")
     public List<Stock> getData(){
         List<Stock> stockList =  stockService.getStocks();
