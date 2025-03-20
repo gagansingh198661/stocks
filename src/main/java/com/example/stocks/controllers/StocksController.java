@@ -1,6 +1,10 @@
 package com.example.stocks.controllers;
 
+import com.example.stocks.dto.InfoDTO;
+import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
+import com.example.stocks.services.AlertService;
+import com.example.stocks.services.StockService;
 import org.openqa.selenium.By;
 
 import org.openqa.selenium.WebDriver;
@@ -16,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +38,11 @@ public class StocksController {
 
     @Autowired
     private StockService stockService;
+
+    @Autowired
+    private AlertService alertService;
+
+    static Map<String, InfoDTO> mapSymbolStock= new HashMap<>();
 
     @GetMapping("/generateData")
     public void generateData(){
@@ -52,9 +62,9 @@ public class StocksController {
 
     @CrossOrigin(origins = "http://localhost:8100")
     @GetMapping("/getData")
-    public List<Stock> getData(){
-        List<Stock> stockList =  stockService.getStocks();
-        return stockList;
+    public Map<String,InfoDTO> getData(){
+        //List<Stock> stockList =  stockService.getStocks();
+        return mapSymbolStock;
     }
 
     @PutMapping("/update")
@@ -85,8 +95,51 @@ public class StocksController {
            String price = getCurrentValue(url);
            stockSymbol_CurrentPriceMap.put(entry.getKey(),price);
        }
+       updateResponseMap(stockSymbol_CurrentPriceMap);
        return stockSymbol_CurrentPriceMap;
 
+    }
+
+    private void updateResponseMap(Map<String, String> stockSymbolCurrentPriceMap) {
+        stockSymbolCurrentPriceMap.forEach((x,y)->{
+            InfoDTO infoDTO = mapSymbolStock.get(x);
+            Stock stock = null;
+            if(infoDTO==null){
+                stock=stockService.findByStockSymbol(y);
+                if (stock == null) {
+                    System.out.println("null");
+                    stock=createStock(x,y);
+                }
+            }
+            stock.setCurrentPrice(new BigDecimal(y));
+            InfoDTO infoDTO1 = new InfoDTO();
+            infoDTO1.setStock(stock);
+            mapSymbolStock.put(stock.getStockSymbol(),infoDTO1);
+        });
+        List<Alert> alerts = alertService.getAlerts();
+        Map<String,List<Alert>> mapSymbolAlertList = new HashMap<>();
+        alerts.stream().forEach(x-> {
+            mapSymbolAlertList.putIfAbsent(x.getStocksymbol(), new LinkedList<Alert>());
+            List<Alert> alertList=mapSymbolAlertList.get(x.getStocksymbol());
+            alertList.add(x);
+            mapSymbolAlertList.put(x.getStocksymbol(), alertList);
+        });
+        for(Map.Entry<String,List<Alert>> entry : mapSymbolAlertList.entrySet()){
+            String symbol = entry.getKey();
+            InfoDTO infoDTO=mapSymbolStock.get(symbol);
+            infoDTO.setAlertList(entry.getValue());
+        }
+        //checkForAlerts
+        //basedonalerts set action
+    }
+
+    private Stock createStock(String symbol,String currentPrice){
+
+        System.out.println("Symbol :"+ symbol+"  price :"+currentPrice  );
+        Stock stock = new Stock();
+        stock.setStockSymbol(symbol);
+        stock.setCurrentPrice(new BigDecimal(currentPrice));
+        return stockService.update(stock);
     }
 
     private Map<String,String> createUrlMapForBasic(){

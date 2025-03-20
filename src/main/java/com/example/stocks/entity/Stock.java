@@ -3,8 +3,11 @@ package com.example.stocks.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "stock")
+@Data
 public class Stock {
 
 
@@ -16,19 +19,31 @@ public class Stock {
     private String name;
 
     @Column(name="lowestprice")
-    private Float lowestPrice;
+    private BigDecimal lowestPrice;
 
     @Column(name="highestprice")
-    private Float highestPrice;
+    private BigDecimal highestPrice;
 
     @Column(name="currentprice")
-    private Float currentPrice;
+    private BigDecimal currentPrice;
 
     @Column(name="targetprice")
-    private Float targetPrice;
+    private BigDecimal targetPrice;
 
-    @Column(name="sold")
-    private boolean sold;
+    public boolean isOwn() {
+        return own;
+    }
+
+    public void setOwn(boolean own) {
+        this.own = own;
+    }
+
+    @Column(name="own")
+    private boolean own;
+
+    @Column(name="version")
+    private long version;
+
 
     public String getStockSymbol() {
         return stockSymbol;
@@ -46,43 +61,46 @@ public class Stock {
         this.name = name;
     }
 
-    public Float getLowestPrice() {
+    public BigDecimal getLowestPrice() {
         return lowestPrice;
     }
 
-    public void setLowestPrice(Float lowestPrice) {
+    public void setLowestPrice(BigDecimal lowestPrice) {
         this.lowestPrice = lowestPrice;
     }
 
-    public Float getHighestPrice() {
+    public BigDecimal getHighestPrice() {
         return highestPrice;
     }
 
-    public void setHighestPrice(Float highestPrice) {
+    public void setHighestPrice(BigDecimal highestPrice) {
         this.highestPrice = highestPrice;
     }
 
-    public Float getCurrentPrice() {
+    public BigDecimal getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(Float currentPrice) {
+    public void setCurrentPrice(BigDecimal currentPrice) {
         this.currentPrice = currentPrice;
     }
 
-    public Float getTargetPrice() {
+    public BigDecimal getTargetPrice() {
         return targetPrice;
     }
 
-    public void setTargetPrice(Float targetPrice) {
+    public void setTargetPrice(BigDecimal targetPrice) {
         this.targetPrice = targetPrice;
     }
 
-    public boolean isSold() {
-        return sold;
+    public long getVersion() {
+        return version;
     }
 
-    public void setSold(boolean sold) {
-        this.sold = sold;
+    public void setVersion(long version) {
+        this.version = version;
     }
+
+
+
 }

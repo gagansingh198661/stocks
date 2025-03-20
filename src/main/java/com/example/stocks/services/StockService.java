@@ -1,4 +1,4 @@
-package com.example.stocks.controllers;
+package com.example.stocks.services;
 
 import com.example.stocks.entity.Stock;
 import com.example.stocks.repository.StockRepository;
@@ -21,4 +21,12 @@ public class StockService {
         return stockRepository.saveAndFlush(stock);
     }
 
+    public List<Stock> updateAll(List<Stock> stocks){
+        return stockRepository.saveAllAndFlush(stocks);
+    }
+
+    public Stock findByStockSymbol(String stockSymbol){
+        System.out.println(stockSymbol);
+        return stockRepository.findByStockSymbol(stockSymbol);
+    }
 }
