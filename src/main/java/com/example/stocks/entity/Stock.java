@@ -30,6 +30,19 @@ public class Stock {
     @Column(name="targetprice")
     private BigDecimal targetPrice;
 
+
+
+    @Column(name="previousprice")
+    private BigDecimal previousPrice;
+
+    public BigDecimal getPreviousPrice() {
+        return previousPrice;
+    }
+
+    public void setPreviousPrice(BigDecimal previousPrice) {
+        this.previousPrice = previousPrice;
+    }
+
     public boolean isOwn() {
         return own;
     }

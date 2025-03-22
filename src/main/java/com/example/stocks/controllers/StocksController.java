@@ -127,7 +127,7 @@ public class StocksController {
         for(Map.Entry<String,List<Alert>> entry : mapSymbolAlertList.entrySet()){
             String symbol = entry.getKey();
             InfoDTO infoDTO=mapSymbolStock.get(symbol);
-            infoDTO.setAlertList(entry.getValue());
+            infoDTO.setAlerts(entry.getValue());
         }
         //checkForAlerts
         //basedonalerts set action
@@ -135,7 +135,7 @@ public class StocksController {
 
     private Stock createStock(String symbol,String currentPrice){
 
-        System.out.println("Symbol :"+ symbol+"  price :"+currentPrice  );
+        System.out.println("Symbol :"+ symbol+"  price :"+currentPrice);
         Stock stock = new Stock();
         stock.setStockSymbol(symbol);
         stock.setCurrentPrice(new BigDecimal(currentPrice));

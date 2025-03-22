@@ -10,6 +10,22 @@ import java.util.List;
 
 @Data
 public class InfoDTO {
+
+    private Action action;
+
+    private Stock stock;
+
+    private List<AlertDTO> alertDTOList;
+
+    public List<Alert> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alert> alerts) {
+        this.alerts = alerts;
+    }
+
+    private List<Alert> alerts;
     public Action getAction() {
         return action;
     }
@@ -26,18 +42,14 @@ public class InfoDTO {
         this.stock = stock;
     }
 
-    public List<Alert> getAlertList() {
-        return alertList;
+    public List<AlertDTO> getAlertDTOList() {
+        return alertDTOList;
     }
 
-    public void setAlertList(List<Alert> alertList) {
-        this.alertList = alertList;
+    public void setAlertDTOList(List<AlertDTO> alertList) {
+        this.alertDTOList = alertList;
     }
 
-    private Action action;
 
-    private Stock stock;
-
-    private List<Alert> alertList;
 
 }
