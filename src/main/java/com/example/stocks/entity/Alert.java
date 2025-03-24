@@ -27,6 +27,12 @@ public class Alert {
     @Column(name="active")
     private boolean active;
 
+    @Column(name="percent")
+    private Integer percent;
+
+    @Column(name = "alerttype")
+    private String alertType;
+
     public Integer getPercent() {
         return percent;
     }
@@ -35,19 +41,14 @@ public class Alert {
         this.percent = percent;
     }
 
-    @Column(name="percent")
-    private Integer percent;
 
-    public AlertType getAlertType() {
+    public String getAlertType() {
         return alertType;
     }
 
-    public void setAlertType(AlertType alertType) {
+    public void setAlertType(String alertType) {
         this.alertType = alertType;
     }
-
-    @Column(name = "alerttype")
-    private AlertType alertType;
 
     public String getStocksymbol() {
         return stocksymbol;

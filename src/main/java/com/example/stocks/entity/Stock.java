@@ -30,10 +30,19 @@ public class Stock {
     @Column(name="targetprice")
     private BigDecimal targetPrice;
 
-
-
     @Column(name="previousprice")
     private BigDecimal previousPrice;
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    @Column(name="active")
+    private boolean active;
 
     public BigDecimal getPreviousPrice() {
         return previousPrice;

@@ -7,9 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 public class RuleEngine {
-    static Map<InfoDTO,List<Rule>> infoDTOListMap;
+    static List<Rule> ruleList;
 
-    static void applyRules(){
+    public static InfoDTO applyRules(InfoDTO infoDTO){
+        for (Rule rule:
+             ruleList) {
+             infoDTO = rule.applyRule(infoDTO);
+        }
+        return infoDTO;
+    }
 
+    public static void setRuleList(List<Rule> ruleList) {
+        RuleEngine.ruleList = ruleList;
     }
 }

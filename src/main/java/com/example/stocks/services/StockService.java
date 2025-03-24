@@ -14,7 +14,7 @@ public class StockService {
     private StockRepository stockRepository;
 
     public List<Stock> getStocks(){
-        return stockRepository.findAll();
+        return stockRepository.findAllByActive(true);
     }
 
     public Stock update(Stock stock){
