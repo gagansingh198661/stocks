@@ -4,10 +4,12 @@ import com.example.stocks.dto.InfoDTO;
 import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
 import com.example.stocks.ruleEngine.RuleEngine;
+import com.example.stocks.rules.BuyMoreRule;
 import com.example.stocks.rules.PercentRule;
 import com.example.stocks.rules.Rule;
 import com.example.stocks.rules.TargetRule;
 import com.example.stocks.services.AlertService;
+import com.example.stocks.services.EmailService;
 import com.example.stocks.services.StockService;
 import org.openqa.selenium.By;
 
@@ -46,6 +48,9 @@ public class StocksController {
 
     @Autowired
     private AlertService alertService;
+
+    @Autowired
+    private EmailService emailService;
 
     static Map<String, InfoDTO> mapSymbolStock= new HashMap<>();
 
@@ -105,14 +110,20 @@ public class StocksController {
     }
 
 
-
-    public Map<String,String> getUpdatedValues(){
+    private List<Rule> addRules(){
         TargetRule targetRule = new TargetRule();
         PercentRule percentRule = new PercentRule();
+        BuyMoreRule buyMoreRule = new BuyMoreRule();
         List<Rule> ruleList = new LinkedList<>();
         ruleList.add(targetRule);
         ruleList.add(percentRule);
-        RuleEngine.setRuleList(ruleList);
+        ruleList.add(buyMoreRule);
+        return ruleList;
+    }
+
+    public Map<String,String> getUpdatedValues(){
+
+        RuleEngine.setRuleList(addRules());
         Map<String,String> stockSymbolURLMap = createUrlMapForBasic();
         Map<String,String> stockSymbol_CurrentPriceMap = new HashMap<>();
         for(Map.Entry<String,String> entry:stockSymbolURLMap.entrySet()){
@@ -170,9 +181,14 @@ public class StocksController {
             infoDTO.setAlertDTOList(null);
             RuleEngine.applyRules(infoDTO);
         }
+        checkAndSendMail(mapSymbolStock);
 
         //checkForAlerts
         //basedonalerts set action
+    }
+
+    private void checkAndSendMail(Map<String, InfoDTO> mapSymbolStock) {
+        emailService.process(mapSymbolStock);
     }
 
     private Stock createStock(String symbol,String currentPrice){

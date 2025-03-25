@@ -33,6 +33,27 @@ public class Stock {
     @Column(name="previousprice")
     private BigDecimal previousPrice;
 
+
+    @Column(name="active")
+    private boolean active;
+
+    @Column(name="own")
+    private boolean own;
+
+    @Column(name="version")
+    private long version;
+
+    @Column(name="boughtprice")
+    private BigDecimal boughtPrice;
+
+    public BigDecimal getBoughtPrice() {
+        return boughtPrice;
+    }
+
+    public void setBoughtPrice(BigDecimal boughtPrice) {
+        this.boughtPrice = boughtPrice;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -41,8 +62,9 @@ public class Stock {
         this.active = active;
     }
 
-    @Column(name="active")
-    private boolean active;
+
+
+
 
     public BigDecimal getPreviousPrice() {
         return previousPrice;
@@ -59,12 +81,6 @@ public class Stock {
     public void setOwn(boolean own) {
         this.own = own;
     }
-
-    @Column(name="own")
-    private boolean own;
-
-    @Column(name="version")
-    private long version;
 
 
     public String getStockSymbol() {

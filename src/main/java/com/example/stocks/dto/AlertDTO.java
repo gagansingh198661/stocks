@@ -8,7 +8,33 @@ import lombok.NoArgsConstructor;
 public class AlertDTO {
     private String message;
 
-    private String price;
+    private String currentprice;
+
+    public String getCurrentprice() {
+        return currentprice;
+    }
+
+    public AlertDTO(String message, String currentprice, String previousPrice, Action action, Type type) {
+        this.message = message;
+        this.currentprice = currentprice;
+        this.previousprice = previousPrice;
+        this.action = action;
+        this.type = type;
+    }
+
+    public void setCurrentprice(String currentprice) {
+        this.currentprice = currentprice;
+    }
+
+    public String getpreviousprice() {
+        return previousprice;
+    }
+
+    public void setPreviousprice(String previousprice) {
+        this.previousprice = previousprice;
+    }
+
+    private String previousprice;
 
     private Action action;
 
@@ -22,13 +48,6 @@ public class AlertDTO {
         this.message = message;
     }
 
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
 
     public Action getAction() {
         return action;
@@ -47,10 +66,5 @@ public class AlertDTO {
     }
 
     public AlertDTO(){}
-    public AlertDTO(String message,String price,Action action,Type type){
-        this.message=message;
-        this.price=price;
-        this.action=action;
-        this.type=type;
-    }
+
 }

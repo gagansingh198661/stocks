@@ -26,7 +26,7 @@ public class PercentRule implements Rule{
                     if (alert.getAlertType()!=null&&alert.getAlertType().equals(AlertType.PERCENT.name())) {
                         int percent = alert.getPercent();
                         if (abovePercent(previousPrice, currentPrice, percent)) {
-                            AlertDTO alertDTO = new AlertDTO("Stock has risen by " + percent + "%", "", Action.HOLD, Type.NORMAL);
+                            AlertDTO alertDTO = new AlertDTO("Stock : "+infoDTO.getStock().getStockSymbol()+" has risen by " + percent + "%", previousPrice.toPlainString(), currentPrice.toPlainString(),  Action.HOLD, Type.NORMAL);
                             alertDTOList.add(alertDTO);
                         }
                     }
@@ -46,7 +46,7 @@ public class PercentRule implements Rule{
                     if(alert.getAlertType()!=null&&alert.getAlertType().equals(AlertType.PERCENT.name())){
                         int percent = alert.getPercent();
                         if(belowPercent(previousPrice,currentPrice,percent)){
-                            AlertDTO alertDTO = new AlertDTO("Stock has declined by "+percent+"%",null,Action.HOLD,Type.NORMAL);
+                            AlertDTO alertDTO = new AlertDTO("Stock has declined by "+percent+"%",previousPrice.toString(),currentPrice.toString(),Action.HOLD,Type.NORMAL);
                             alertDTOList.add(alertDTO);
                         }
                     }
