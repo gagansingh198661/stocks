@@ -18,6 +18,9 @@ public class BuyMoreRule implements Rule{
         }
         BigDecimal currentPrice = infoDTO.getStock().getCurrentPrice();
         BigDecimal boughtPrice = infoDTO.getStock().getBoughtPrice();
+        if (boughtPrice==null){
+            return infoDTO;
+        }
         if (alerts!=null&&alerts.size()!=0){
             for (Alert alert:
                  alerts) {
