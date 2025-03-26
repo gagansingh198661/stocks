@@ -31,7 +31,7 @@ public class TargetRule implements Rule{
                     }
                 }else{
                     if(currentPrice.compareTo(targetPrice)<=0){
-                        AlertDTO alert = new AlertDTO("Target Price reached : Buy Stock", currentPrice.toPlainString(), targetPrice.toString(), Action.SELL, Type.IMPORTANT);
+                        AlertDTO alert = new AlertDTO("Target Price reached : Buy Stock : "+infoDTO.getStock().getStockSymbol(), currentPrice.toPlainString(), targetPrice.toString(), Action.SELL, Type.IMPORTANT);
                         alertList.add(alert);
                     }
                 }
