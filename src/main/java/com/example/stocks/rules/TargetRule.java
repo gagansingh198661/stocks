@@ -4,6 +4,7 @@ import com.example.stocks.dto.Action;
 import com.example.stocks.dto.AlertDTO;
 import com.example.stocks.dto.InfoDTO;
 import com.example.stocks.dto.Type;
+import com.example.stocks.entity.Alert;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ import java.util.List;
 public class TargetRule implements Rule{
 
     @Override
-    public InfoDTO applyRule(InfoDTO infoDTO) {
+    public InfoDTO applyRule(InfoDTO infoDTO,List<Alert> stockAlerts) {
 
         List<AlertDTO> alertList = infoDTO.getAlertDTOList();
         if (alertList==null){

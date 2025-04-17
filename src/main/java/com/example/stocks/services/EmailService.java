@@ -67,7 +67,13 @@ public class EmailService {
 
     private boolean notSent(AlertDTO alertDto, InfoDTO infoDTO) {
         List<SentEmail> sentEmailList =stockSymbolEmailSentMap.get(infoDTO.getStock().getStockSymbol());
-        if(sentEmailList==null||sentEmailList.size()==0)return true;
+        if(sentEmailList==null||sentEmailList.size()==0){
+            sentEmailList=sentEmailRepository.findAllByStocksymbol(infoDTO.getStock().getStockSymbol());
+            if(sentEmailList==null||sentEmailList.size()==0) {
+                return true;
+            }
+            stockSymbolEmailSentMap.put(infoDTO.getStock().getStockSymbol(),sentEmailList);
+        }
         for (SentEmail sentEmail:
              sentEmailList) {
             if (alertDto.getCurrentprice().equals(sentEmail.getCurrentprice())&&

@@ -9,20 +9,19 @@ import java.util.List;
 
 public class PercentRule implements Rule{
     @Override
-    public InfoDTO applyRule(InfoDTO infoDTO) {
+    public InfoDTO applyRule(InfoDTO infoDTO, List<Alert> stockAlerts) {
 
         if(infoDTO.getStock()!=null&&infoDTO.getStock().isOwn()) {
             if (infoDTO.getAlertDTOList() != null &&
-                    infoDTO.getAlerts() != null &&
+                    stockAlerts != null &&
                     infoDTO.getStock().getCurrentPrice()!=null &&
                     infoDTO.getStock().getPreviousPrice()!=null
             ) {
                 List<AlertDTO> alertDTOList = infoDTO.getAlertDTOList();
-                List<Alert> alertList = infoDTO.getAlerts();
                 BigDecimal currentPrice = infoDTO.getStock().getCurrentPrice();
                 BigDecimal previousPrice = infoDTO.getStock().getPreviousPrice();
 
-                for (Alert alert : alertList) {
+                for (Alert alert : stockAlerts) {
                     if (alert.getAlertType()!=null&&alert.getAlertType().equals(AlertType.PERCENT.name())) {
                         int percent = alert.getPercent();
                         if (abovePercent(previousPrice, currentPrice, percent)) {
@@ -34,15 +33,14 @@ public class PercentRule implements Rule{
             }
         }else{
             if (infoDTO.getAlertDTOList() != null &&
-                    infoDTO.getAlerts() != null &&
+                    stockAlerts != null &&
                     infoDTO.getStock().getCurrentPrice()!=null &&
                     infoDTO.getStock().getPreviousPrice()!=null) {
                 List<AlertDTO> alertDTOList = infoDTO.getAlertDTOList();
-                List<Alert> alertList = infoDTO.getAlerts();
                 BigDecimal currentPrice = infoDTO.getStock().getCurrentPrice();
                 BigDecimal previousPrice = infoDTO.getStock().getPreviousPrice();
 
-                for (Alert alert: alertList) {
+                for (Alert alert: stockAlerts) {
                     if(alert.getAlertType()!=null&&alert.getAlertType().equals(AlertType.PERCENT.name())){
                         int percent = alert.getPercent();
                         if(belowPercent(previousPrice,currentPrice,percent)){

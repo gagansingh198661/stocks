@@ -26,6 +26,7 @@ public class InfoDTO {
     }
 
     private List<Alert> alerts;
+
     public Action getAction() {
         return action;
     }

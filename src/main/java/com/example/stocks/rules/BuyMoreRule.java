@@ -7,11 +7,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class BuyMoreRule implements Rule{
     @Override
-    public InfoDTO applyRule(InfoDTO infoDTO) {
-        List<Alert> alerts = infoDTO.getAlerts();
+    public InfoDTO applyRule(InfoDTO infoDTO, List<Alert> stockAlerts) {
         List<AlertDTO> alertDTOList = infoDTO.getAlertDTOList();
         if (alertDTOList==null){
             alertDTOList=new LinkedList<>();
@@ -21,9 +21,9 @@ public class BuyMoreRule implements Rule{
         if (boughtPrice==null){
             return infoDTO;
         }
-        if (alerts!=null&&alerts.size()!=0){
+        if (stockAlerts!=null&&stockAlerts.size()!=0){
             for (Alert alert:
-                 alerts) {
+                    stockAlerts) {
                 if (alert.getAlertType().equals(AlertType.BUYMORE.name())){
                     int percent = alert.getPercent();
                     if(belowPercent(boughtPrice,currentPrice,percent)){

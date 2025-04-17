@@ -10,9 +10,11 @@ public class AlertDTO {
 
     private String currentprice;
 
-    public String getCurrentprice() {
-        return currentprice;
-    }
+    private String previousprice;
+
+    private Action action;
+
+    private Type type;
 
     public AlertDTO(String message, String currentprice, String previousPrice, Action action, Type type) {
         this.message = message;
@@ -34,11 +36,6 @@ public class AlertDTO {
         this.previousprice = previousprice;
     }
 
-    private String previousprice;
-
-    private Action action;
-
-    private Type type;
 
     public String getMessage() {
         return message;
@@ -64,6 +61,11 @@ public class AlertDTO {
     public void setType(Type type) {
         this.type = type;
     }
+
+    public String getCurrentprice() {
+        return currentprice;
+    }
+
 
     public AlertDTO(){}
 

@@ -1,5 +1,6 @@
 package com.example.stocks.controllers;
 
+import com.example.stocks.dto.CreateAlertRequest;
 import com.example.stocks.dto.InfoDTO;
 import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
@@ -17,10 +18,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -74,15 +74,22 @@ public class StocksController {
 
     @CrossOrigin(origins = "http://localhost:8100")
     @GetMapping("/getData")
-    public Map<String,InfoDTO> getData(){
-        //List<Stock> stockList =  stockService.getStocks();
-        return mapSymbolStock;
+    public InfoDTO[] getData(){
+        InfoDTO[] infoDtoArray = new InfoDTO[mapSymbolStock.values().size()];
+        int counter = 0;
+        for (InfoDTO infoDTO : mapSymbolStock.values()) {
+            infoDtoArray[counter] = infoDTO;
+            counter++;
+        }
+        return infoDtoArray;
     }
 
     @PutMapping("/update")
     public Stock updateStock(Stock stock){
         return stockService.update(stock);
     }
+
+
 
     @PutMapping("/updateMapTesting/")
     public Map<String, String> updateStockMap(String symbol, String price){
@@ -177,9 +184,9 @@ public class StocksController {
         for(Map.Entry<String,List<Alert>> entry : mapSymbolAlertList.entrySet()){
             String symbol = entry.getKey();
             InfoDTO infoDTO=mapSymbolStock.get(symbol);
-            infoDTO.setAlerts(entry.getValue());
             infoDTO.setAlertDTOList(null);
-            RuleEngine.applyRules(infoDTO);
+            infoDTO.setAlerts(entry.getValue());
+            RuleEngine.applyRules(infoDTO,entry.getValue());
         }
         checkAndSendMail(mapSymbolStock);
 
