@@ -84,6 +84,16 @@ public class StocksController {
         return infoDtoArray;
     }
 
+    @CrossOrigin(origins = "http://localhost:8100")
+    @GetMapping("/getStock")
+    public InfoDTO getStock(@RequestParam(required = true) String stockSymbol){
+        InfoDTO infoDto = stockService.getStock(stockSymbol);
+        RuleEngine.applyRules(infoDto,infoDto.getAlerts());
+        mapSymbolStock.put(stockSymbol,infoDto);
+        return infoDto;
+    }
+
+
     @PutMapping("/update")
     public Stock updateStock(Stock stock){
         return stockService.update(stock);

@@ -7,4 +7,5 @@ public enum AlertType {
 
     FIFTYTWOWEEKSHIGH,
     FIFTYTWOWEEKSLOW;
+
 }

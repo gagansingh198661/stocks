@@ -2,10 +2,7 @@ package com.example.stocks.entity;
 
 import com.example.stocks.dto.AlertDTO;
 import com.example.stocks.dto.AlertType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
@@ -14,6 +11,7 @@ import java.math.BigDecimal;
 public class Alert {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name="stocksymbol")
     private String stocksymbol;
@@ -32,6 +30,14 @@ public class Alert {
 
     @Column(name = "alerttype")
     private String alertType;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Integer getPercent() {
         return percent;

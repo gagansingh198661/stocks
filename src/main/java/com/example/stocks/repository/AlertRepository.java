@@ -12,4 +12,6 @@ public interface AlertRepository extends JpaRepository<Alert,Long> {
 
     List<Alert> findAllByActive(boolean active);
 
+    List<Alert> findAllByStocksymbolAndActive(String stockSymbol,boolean active);
+
 }
