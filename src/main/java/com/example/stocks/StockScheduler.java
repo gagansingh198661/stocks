@@ -26,7 +26,7 @@ public class StockScheduler {
         controller.generateData();
     }
 
-    @Scheduled(fixedDelay = 15000,initialDelay = 5000)
+    @Scheduled(fixedDelay = 15000,initialDelay = 10000)
     public void runCurrentDataFetch(){
         Map<String,String> map=controller.getUpdatedValues();
 

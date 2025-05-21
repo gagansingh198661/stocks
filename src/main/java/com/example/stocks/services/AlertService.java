@@ -26,7 +26,7 @@ public class AlertService {
     }
 
     public List<Alert> getAlertsByStockSymbol(String stockSymbol){
-        List<Alert> alerts = alertRepository.findAllByStocksymbolAndActive(stockSymbol,true);
+        List<Alert> alerts = alertRepository.findAllByStocksymbol(stockSymbol);
         if (alerts.size()==0){
             System.out.println("No alerts found for : "+stockSymbol);
         }
@@ -39,6 +39,10 @@ public class AlertService {
         }catch(Exception e){
             System.out.println("Exception : "+e);
         }
+    }
+
+    public void updateAlert(Alert alert){
+        alertRepository.saveAndFlush(alert);
     }
 
     private boolean createPercentAlert(CreateAlertRequest request) {

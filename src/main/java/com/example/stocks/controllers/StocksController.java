@@ -18,8 +18,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
@@ -29,6 +27,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.Socket;
 import java.util.*;
+
 import java.util.stream.Collectors;
 
 @RestController
@@ -72,7 +71,9 @@ public class StocksController {
         System.out.println("Data Scraping finished");
     }
 
-    @CrossOrigin(origins = "http://localhost:8100")
+
+
+
     @GetMapping("/getData")
     public InfoDTO[] getData(){
         InfoDTO[] infoDtoArray = new InfoDTO[mapSymbolStock.values().size()];
@@ -148,9 +149,10 @@ public class StocksController {
            if(isConnectedToInternet()){
                String price = getCurrentValue(url);
                stockSymbol_CurrentPriceMap.put(entry.getKey(),price);
+               updateResponseMap(entry.getKey(),price);
            }
         }
-        updateResponseMap(stockSymbol_CurrentPriceMap);
+
         return stockSymbol_CurrentPriceMap;
 
     }
@@ -164,25 +166,29 @@ public class StocksController {
         return false;
     }
 
-    private void updateResponseMap(Map<String, String> stockSymbolCurrentPriceMap) {
-        stockSymbolCurrentPriceMap.forEach((x,y)->{
-            InfoDTO infoDTO = mapSymbolStock.get(x);
-            if(infoDTO==null){
-                infoDTO = new InfoDTO();
-            }
-            Stock stock= infoDTO.getStock();
-            if (stock==null){
-                stock=stockService.findByStockSymbol(x);
-            }
-            if (stock == null) {
-                System.out.println("Stock : "+y);
-                stock=createStock(x,y);
-            }
-            System.out.println(x+" :  "+y);
-            stock.setCurrentPrice(new BigDecimal(y));
+    private void updateResponseMap(String stockSymbol,String price) {
+
+
+        InfoDTO infoDTO = mapSymbolStock.get(stockSymbol);
+        if(infoDTO==null){
+            infoDTO = new InfoDTO();
+        }
+        Stock stock= infoDTO.getStock();
+        if (stock==null){
+            stock=stockService.findByStockSymbol(stockSymbol);
+        }
+        if (stock == null) {
+            System.out.println("Stock : "+stockSymbol);
+            stock=createStock(stockSymbol,price);
+        }
+        System.out.println(stockSymbol+" :  "+price);
+        if(stockSymbol!=null) {
+            stock.setCurrentPrice(new BigDecimal(price));
+            stockService.update(stock);
             infoDTO.setStock(stock);
-            mapSymbolStock.put(stock.getStockSymbol(),infoDTO);
-        });
+            mapSymbolStock.put(stock.getStockSymbol(), infoDTO);
+        }
+
         List<Alert> alerts = alertService.getAlerts();
         Map<String,List<Alert>> mapSymbolAlertList = new HashMap<>();
         alerts.stream().forEach(x-> {
@@ -193,10 +199,12 @@ public class StocksController {
         });
         for(Map.Entry<String,List<Alert>> entry : mapSymbolAlertList.entrySet()){
             String symbol = entry.getKey();
-            InfoDTO infoDTO=mapSymbolStock.get(symbol);
-            infoDTO.setAlertDTOList(null);
-            infoDTO.setAlerts(entry.getValue());
-            RuleEngine.applyRules(infoDTO,entry.getValue());
+            InfoDTO infoDTO1=mapSymbolStock.get(symbol);
+            if(infoDTO1!=null) {
+                infoDTO1.setAlertDTOList(null);
+                infoDTO1.setAlerts(entry.getValue());
+                RuleEngine.applyRules(infoDTO1, entry.getValue());
+            }
         }
         checkAndSendMail(mapSymbolStock);
 
@@ -224,15 +232,19 @@ public class StocksController {
         return stockSymbolURLMap;
     }
     private String getCurrentValue(String url){
-        driver.get(url);
-        List<WebElement>  spanElements = driver.findElements(By.tagName("span"));
-        for (WebElement element:
-             spanElements) {
-            String value = element.getAttribute("data-testid");
-            if(value!=null){
-                String price = element.getAttribute("innerHTML");
-                return price;
+        try{
+            driver.get(url);
+            List<WebElement>  spanElements = driver.findElements(By.tagName("span"));
+            for (WebElement element:
+                 spanElements) {
+                String value = element.getAttribute("data-testid");
+                if(value!=null){
+                    String price = element.getAttribute("innerHTML");
+                    return price;
+                }
             }
+        }catch(Exception e){
+            System.out.println("Error while getting info : "+e);
         }
         return new String();
     }

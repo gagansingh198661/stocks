@@ -1,6 +1,7 @@
 package com.example.stocks.controllers;
 
 import com.example.stocks.dto.CreateAlertRequest;
+import com.example.stocks.entity.Alert;
 import com.example.stocks.services.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -32,6 +33,18 @@ public class AlertController {
         System.out.println("Delete alert : "+ id);
         try{
             alertService.deleteAlert(id);
+            return new HttpEntity<>(HttpStatus.OK);
+        }catch(Exception e){
+            return new HttpEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @CrossOrigin(origins = "http://localhost:8100")
+    @PatchMapping("/alert/patch")
+    public HttpEntity<?> patch(@RequestBody Alert alert){
+        System.out.println("Patch alert : "+ alert);
+        try{
+            alertService.updateAlert(alert);
             return new HttpEntity<>(HttpStatus.OK);
         }catch(Exception e){
             return new HttpEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

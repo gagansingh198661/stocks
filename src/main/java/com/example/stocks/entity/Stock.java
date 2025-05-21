@@ -46,6 +46,17 @@ public class Stock {
     @Column(name="boughtprice")
     private BigDecimal boughtPrice;
 
+    public BigDecimal getLastSoldPrice() {
+        return lastSoldPrice;
+    }
+
+    public void setLastSoldPrice(BigDecimal lastSoldPrice) {
+        this.lastSoldPrice = lastSoldPrice;
+    }
+
+    @Column(name="lastsoldprice")
+    private BigDecimal lastSoldPrice;
+
     public BigDecimal getBoughtPrice() {
         return boughtPrice;
     }

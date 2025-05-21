@@ -41,25 +41,28 @@ public class EmailService {
         for (InfoDTO infoDTO:
              infoDTOList) {
             List<AlertDTO> alertDTOList=infoDTO.getAlertDTOList();
-            for (AlertDTO alertDto:
-                 alertDTOList) {
+            if(alertDTOList!=null){
+                for (AlertDTO alertDto:
+                        alertDTOList) {
 
-                if(notSent(alertDto,infoDTO)) {
-                    sendEmail("iqalertsg@gmail.com", "IQALERT", alertDto.getMessage());
-                    SentEmail sentEmail = new SentEmail();
-                    sentEmail.setCurrentprice(alertDto.getCurrentprice());
-                    sentEmail.setPreviousprice(alertDto.getpreviousprice());
-                    sentEmail.setStocksymbol(infoDTO.getStock().getStockSymbol());
-                    sentEmailList.add(sentEmail);
-                    List<SentEmail> sentEmailList1=stockSymbolEmailSentMap.get(infoDTO.getStock().getStockSymbol());
-                    if (sentEmailList1==null){
-                        sentEmailList1=new LinkedList<>();
+                    if(notSent(alertDto,infoDTO)) {
+                        sendEmail("iqalertsg@gmail.com", "IQALERT", alertDto.getMessage());
+                        SentEmail sentEmail = new SentEmail();
+                        sentEmail.setCurrentprice(alertDto.getCurrentprice());
+                        sentEmail.setPreviousprice(alertDto.getpreviousprice());
+                        sentEmail.setStocksymbol(infoDTO.getStock().getStockSymbol());
+                        sentEmailList.add(sentEmail);
+                        List<SentEmail> sentEmailList1=stockSymbolEmailSentMap.get(infoDTO.getStock().getStockSymbol());
+                        if (sentEmailList1==null){
+                            sentEmailList1=new LinkedList<>();
+                        }
+                        sentEmailList1.add(sentEmail);
+                        sentEmailList.add(sentEmail);
+                        stockSymbolEmailSentMap.put(infoDTO.getStock().getStockSymbol(),sentEmailList1);
                     }
-                    sentEmailList1.add(sentEmail);
-                    sentEmailList.add(sentEmail);
-                    stockSymbolEmailSentMap.put(infoDTO.getStock().getStockSymbol(),sentEmailList1);
                 }
             }
+
         }
         sentEmailRepository.saveAll(sentEmailList);
 
