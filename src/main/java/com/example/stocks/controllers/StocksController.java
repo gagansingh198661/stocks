@@ -1,6 +1,5 @@
 package com.example.stocks.controllers;
 
-import com.example.stocks.dto.CreateAlertRequest;
 import com.example.stocks.dto.InfoDTO;
 import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
@@ -28,6 +27,7 @@ import java.math.BigDecimal;
 import java.net.Socket;
 import java.util.*;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,9 +51,9 @@ public class StocksController {
     @Autowired
     private EmailService emailService;
 
-    static Map<String, InfoDTO> mapSymbolStock= new HashMap<>();
+    static Map<String, InfoDTO> mapSymbolStock= new ConcurrentHashMap<>();
 
-    static Map<String,String> stockSymbol_CurrentPriceMap1 = new HashMap<>();
+    Map<String,String> stockSymbol_CurrentPriceMap1 = new HashMap<>();
 
     @GetMapping("/generateData")
     public void generateData(){
@@ -75,14 +75,8 @@ public class StocksController {
 
 
     @GetMapping("/getData")
-    public InfoDTO[] getData(){
-        InfoDTO[] infoDtoArray = new InfoDTO[mapSymbolStock.values().size()];
-        int counter = 0;
-        for (InfoDTO infoDTO : mapSymbolStock.values()) {
-            infoDtoArray[counter] = infoDTO;
-            counter++;
-        }
-        return infoDtoArray;
+    public List<InfoDTO> getData(){
+        return createInfoDTOList();
     }
 
     @CrossOrigin(origins = "http://localhost:8100")
@@ -141,18 +135,21 @@ public class StocksController {
 
     public Map<String,String> getUpdatedValues(){
 
-        RuleEngine.setRuleList(addRules());
-        Map<String,String> stockSymbolURLMap = createUrlMapForBasic();
+        List<Stock> stocksList = stockService.getStocks();
+
+
+        Map<String,String> stockSymbolURLMap = createUrlMapForBasic(stocksList);
         Map<String,String> stockSymbol_CurrentPriceMap = new HashMap<>();
+        Map<String,Stock> stockSymbol_Stock_Map =  new HashMap<>();
+        stocksList.forEach( it-> stockSymbol_Stock_Map.put(it.getStockSymbol(),it));
         for(Map.Entry<String,String> entry:stockSymbolURLMap.entrySet()){
            String url = entry.getValue();
            if(isConnectedToInternet()){
                String price = getCurrentValue(url);
                stockSymbol_CurrentPriceMap.put(entry.getKey(),price);
-               updateResponseMap(entry.getKey(),price);
+               updateResponseMap(entry.getKey(),price,stockSymbol_Stock_Map.get(entry.getKey()));
            }
         }
-
         return stockSymbol_CurrentPriceMap;
 
     }
@@ -166,23 +163,20 @@ public class StocksController {
         return false;
     }
 
-    private void updateResponseMap(String stockSymbol,String price) {
+    private void updateResponseMap(String stockSymbol, String price, Stock stock) {
 
 
         InfoDTO infoDTO = mapSymbolStock.get(stockSymbol);
         if(infoDTO==null){
             infoDTO = new InfoDTO();
         }
-        Stock stock= infoDTO.getStock();
-        if (stock==null){
-            stock=stockService.findByStockSymbol(stockSymbol);
-        }
+
         if (stock == null) {
             System.out.println("Stock : "+stockSymbol);
             stock=createStock(stockSymbol,price);
         }
         System.out.println(stockSymbol+" :  "+price);
-        if(stockSymbol!=null) {
+        if(stockSymbol!=null&&infoDTO!=null) {
             stock.setCurrentPrice(new BigDecimal(price));
             stockService.update(stock);
             infoDTO.setStock(stock);
@@ -206,7 +200,7 @@ public class StocksController {
                 RuleEngine.applyRules(infoDTO1, entry.getValue());
             }
         }
-        checkAndSendMail(mapSymbolStock);
+        //checkAndSendMail(mapSymbolStock);
 
         //checkForAlerts
         //basedonalerts set action
@@ -226,9 +220,14 @@ public class StocksController {
         return stockService.update(stock);
     }
 
-    private Map<String,String> createUrlMapForBasic(){
-        List<String> stocksList=stockService.getStocks().stream().map(x->x.getStockSymbol()).toList();
-        Map<String,String> stockSymbolURLMap= stocksList.stream().collect(Collectors.toMap(x-> x,x-> "https://finance.yahoo.com/quote/"+x+"/"));
+    private Map<String,String> createUrlMapForBasic(List<Stock> stocksList){
+        List<String> stockSymbolList=stockService.getStocks().stream().map(x->x.getStockSymbol()).toList();
+        Map<String,String> stockSymbolURLMap= stockSymbolList.stream().collect(Collectors.toMap(x-> x,x-> "https://finance.yahoo.com/quote/"+x+"/"));
+        stocksList.stream().forEach(x-> {
+
+            String stockSymbol = x.getStockSymbol();
+            stockSymbolURLMap.get(stockSymbol);
+        });
         return stockSymbolURLMap;
     }
     private String getCurrentValue(String url){
@@ -307,5 +306,33 @@ public class StocksController {
         List<String> stocksList=generateStockList();
         List<String> urlList=stocksList.stream().map(x-> "https://finance.yahoo.com/quote/"+x+"/history/").toList();
         return urlList;
+    }
+
+    private List<InfoDTO> createInfoDTOList(){
+        List<Stock> stockList =stockService.getStocks();
+        List<InfoDTO> infoDTOList = new LinkedList<>();
+        List<Alert> alerts = alertService.getAlerts();
+
+        Map<String,List<Alert>> mapSymbolAlertList = new HashMap<>();
+        alerts.stream().forEach(x-> {
+            mapSymbolAlertList.putIfAbsent(x.getStocksymbol(), new LinkedList<Alert>());
+            List<Alert> alertList=mapSymbolAlertList.get(x.getStocksymbol());
+            alertList.add(x);
+            mapSymbolAlertList.put(x.getStocksymbol(), alertList);
+        });
+
+        for (Stock stock:
+                stockList) {
+            InfoDTO infoDTO = new InfoDTO();
+            infoDTO.setStock(stock);
+            List<Alert> alertList = mapSymbolAlertList.get(stock.getStockSymbol());
+            infoDTO.setAlerts(alertList);
+            if(RuleEngine.getsize()==0)
+            RuleEngine.setRuleList(addRules());
+            RuleEngine.applyRules(infoDTO,alertList);
+            infoDTOList.add(infoDTO);
+        }
+
+        return infoDTOList;
     }
 }

@@ -46,6 +46,20 @@ public class Stock {
     @Column(name="boughtprice")
     private BigDecimal boughtPrice;
 
+    @Column(name="lastsoldprice")
+    private BigDecimal lastSoldPrice;
+
+    public Integer getUnits() {
+        return units;
+    }
+
+    public void setUnits(Integer units) {
+        this.units = units;
+    }
+
+    @Column(name="quantity")
+    private Integer units;
+
     public BigDecimal getLastSoldPrice() {
         return lastSoldPrice;
     }
@@ -54,8 +68,6 @@ public class Stock {
         this.lastSoldPrice = lastSoldPrice;
     }
 
-    @Column(name="lastsoldprice")
-    private BigDecimal lastSoldPrice;
 
     public BigDecimal getBoughtPrice() {
         return boughtPrice;
@@ -73,6 +85,13 @@ public class Stock {
         this.active = active;
     }
 
+    public boolean isOwn() {
+        return own;
+    }
+
+    public void setOwn(boolean own) {
+        this.own = own;
+    }
 
 
 
@@ -85,13 +104,6 @@ public class Stock {
         this.previousPrice = previousPrice;
     }
 
-    public boolean isOwn() {
-        return own;
-    }
-
-    public void setOwn(boolean own) {
-        this.own = own;
-    }
 
 
     public String getStockSymbol() {

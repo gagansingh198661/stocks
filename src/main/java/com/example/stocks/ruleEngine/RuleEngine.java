@@ -21,4 +21,9 @@ public class RuleEngine {
     public static void setRuleList(List<Rule> ruleList) {
         RuleEngine.ruleList = ruleList;
     }
+
+    public static int getsize(){
+        if(ruleList==null) return 0;
+        return ruleList.size();
+    }
 }

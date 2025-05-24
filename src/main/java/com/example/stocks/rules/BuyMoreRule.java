@@ -33,7 +33,7 @@ public class BuyMoreRule implements Rule{
                 }
             }
         }
-        return null;
+        return infoDTO;
     }
 
     private boolean belowPercent(BigDecimal bought, BigDecimal current, int percent) {
