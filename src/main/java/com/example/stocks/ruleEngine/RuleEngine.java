@@ -11,9 +11,11 @@ public class RuleEngine {
     static List<Rule> ruleList;
 
     public static InfoDTO applyRules(InfoDTO infoDTO, List<Alert> stockAlerts){
-        for (Rule rule:
-             ruleList) {
-             infoDTO = rule.applyRule(infoDTO,stockAlerts);
+        if(ruleList!=null&&ruleList.size()!=0) {
+            for (Rule rule :
+                    ruleList) {
+                infoDTO = rule.applyRule(infoDTO, stockAlerts);
+            }
         }
         return infoDTO;
     }
