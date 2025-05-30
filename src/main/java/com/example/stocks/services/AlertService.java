@@ -3,6 +3,7 @@ package com.example.stocks.services;
 import com.example.stocks.dto.AlertType;
 import com.example.stocks.dto.CreateAlertRequest;
 import com.example.stocks.entity.Alert;
+import com.example.stocks.entity.Stock;
 import com.example.stocks.repository.AlertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,35 @@ public class AlertService {
             return true;
         }catch(Exception e){
             System.out.println(e);
+        }
+        return false;
+    }
+
+    //this alert will always be target based
+    public boolean createAlertFromStock(Stock stock) {
+        try {
+            List<Alert> alerts = getAlertsByStockSymbol(stock.getStockSymbol());
+            boolean alertFound = false;
+            for (Alert alert :
+                    alerts) {
+                if (alert.getAlertType().equalsIgnoreCase("Target")) {
+                    if (stock.getTargetPrice().toString().equals(alert.getLowerlimit().toString())) {
+                        alertFound = true;
+                    }
+                }
+            }
+            if (!alertFound) {
+                Alert alert = new Alert();
+                alert.setAlertType(AlertType.TARGET.name());
+                alert.setActive(true);
+                alert.setLowerlimit(stock.getTargetPrice());
+                alert.setUpperlimit(stock.getTargetPrice());
+                alert.setStocksymbol(stock.getStockSymbol());
+                alertRepository.save(alert);
+            }
+            return true;
+        }catch(Exception e){
+            System.out.println("Error while creating alert :" + e);
         }
         return false;
     }

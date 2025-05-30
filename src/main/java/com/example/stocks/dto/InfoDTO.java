@@ -15,7 +15,8 @@ public class InfoDTO {
 
     private Stock stock;
 
-    private List<AlertDTO> alertDTOList;
+
+    private List<Alert> alerts;
 
     public List<Alert> getAlerts() {
         return alerts;
@@ -25,7 +26,6 @@ public class InfoDTO {
         this.alerts = alerts;
     }
 
-    private List<Alert> alerts;
 
     public Action getAction() {
         return action;
@@ -43,13 +43,6 @@ public class InfoDTO {
         this.stock = stock;
     }
 
-    public List<AlertDTO> getAlertDTOList() {
-        return alertDTOList;
-    }
-
-    public void setAlertDTOList(List<AlertDTO> alertList) {
-        this.alertDTOList = alertList;
-    }
 
 
 

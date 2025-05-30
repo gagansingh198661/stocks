@@ -28,14 +28,14 @@ public class AlertController {
     }
 
     @CrossOrigin(origins = "http://localhost:8100")
-    @DeleteMapping("/alert/deleteAlert")
-    public HttpEntity<?> deleteAlert(@RequestParam Long id){
+    @DeleteMapping("/alert/{id}")
+    public Boolean deleteAlert(@PathVariable Long id){
         System.out.println("Delete alert : "+ id);
         try{
             alertService.deleteAlert(id);
-            return new HttpEntity<>(HttpStatus.OK);
+            return true;
         }catch(Exception e){
-            return new HttpEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return false;
         }
     }
 

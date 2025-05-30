@@ -12,12 +12,11 @@ public class PercentRule implements Rule{
     public InfoDTO applyRule(InfoDTO infoDTO, List<Alert> stockAlerts) {
 
         if(infoDTO.getStock()!=null&&infoDTO.getStock().isOwn()) {
-            if (infoDTO.getAlertDTOList() != null &&
-                    stockAlerts != null &&
+            if (   stockAlerts != null &&
                     infoDTO.getStock().getCurrentPrice()!=null &&
                     infoDTO.getStock().getPreviousPrice()!=null
             ) {
-                List<AlertDTO> alertDTOList = infoDTO.getAlertDTOList();
+
                 BigDecimal currentPrice = infoDTO.getStock().getCurrentPrice();
                 BigDecimal previousPrice = infoDTO.getStock().getPreviousPrice();
 
@@ -26,17 +25,17 @@ public class PercentRule implements Rule{
                         int percent = alert.getPercent();
                         if (abovePercent(previousPrice, currentPrice, percent)) {
                             AlertDTO alertDTO = new AlertDTO("Stock : "+infoDTO.getStock().getStockSymbol()+" has risen by " + percent + "%", previousPrice.toPlainString(), currentPrice.toPlainString(),  Action.HOLD, Type.NORMAL);
-                            alertDTOList.add(alertDTO);
+                            alert.setAlertDTO(alertDTO);
+
                         }
                     }
                 }
             }
         }else{
-            if (infoDTO.getAlertDTOList() != null &&
-                    stockAlerts != null &&
+            if (stockAlerts != null &&
                     infoDTO.getStock().getCurrentPrice()!=null &&
                     infoDTO.getStock().getPreviousPrice()!=null) {
-                List<AlertDTO> alertDTOList = infoDTO.getAlertDTOList();
+
                 BigDecimal currentPrice = infoDTO.getStock().getCurrentPrice();
                 BigDecimal previousPrice = infoDTO.getStock().getPreviousPrice();
 
@@ -45,7 +44,8 @@ public class PercentRule implements Rule{
                         int percent = alert.getPercent();
                         if(belowPercent(previousPrice,currentPrice,percent)){
                             AlertDTO alertDTO = new AlertDTO("Stock has declined by "+percent+"%",previousPrice.toString(),currentPrice.toString(),Action.HOLD,Type.NORMAL);
-                            alertDTOList.add(alertDTO);
+                            //alertDTOList.add(alertDTO);
+                            alert.setAlertDTO(alertDTO);
                         }
                     }
                 }

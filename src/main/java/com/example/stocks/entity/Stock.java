@@ -49,49 +49,9 @@ public class Stock {
     @Column(name="lastsoldprice")
     private BigDecimal lastSoldPrice;
 
-    public Integer getUnits() {
-        return units;
-    }
-
-    public void setUnits(Integer units) {
-        this.units = units;
-    }
-
     @Column(name="quantity")
     private Integer units;
 
-    public BigDecimal getLastSoldPrice() {
-        return lastSoldPrice;
-    }
-
-    public void setLastSoldPrice(BigDecimal lastSoldPrice) {
-        this.lastSoldPrice = lastSoldPrice;
-    }
-
-
-    public BigDecimal getBoughtPrice() {
-        return boughtPrice;
-    }
-
-    public void setBoughtPrice(BigDecimal boughtPrice) {
-        this.boughtPrice = boughtPrice;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean isOwn() {
-        return own;
-    }
-
-    public void setOwn(boolean own) {
-        this.own = own;
-    }
 
 
 
@@ -162,6 +122,46 @@ public class Stock {
         this.version = version;
     }
 
+    public Integer getUnits() {
+        return units;
+    }
+
+    public void setUnits(Integer units) {
+        this.units = units;
+    }
+
+    public BigDecimal getLastSoldPrice() {
+        return lastSoldPrice;
+    }
+
+    public void setLastSoldPrice(BigDecimal lastSoldPrice) {
+        this.lastSoldPrice = lastSoldPrice;
+    }
+
+
+    public BigDecimal getBoughtPrice() {
+        return boughtPrice;
+    }
+
+    public void setBoughtPrice(BigDecimal boughtPrice) {
+        this.boughtPrice = boughtPrice;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isOwn() {
+        return own;
+    }
+
+    public void setOwn(boolean own) {
+        this.own = own;
+    }
 
 
 }

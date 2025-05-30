@@ -31,6 +31,17 @@ public class Alert {
     @Column(name = "alerttype")
     private String alertType;
 
+    public AlertDTO getAlertDTO() {
+        return alertDTO;
+    }
+
+    public void setAlertDTO(AlertDTO alertDTO) {
+        this.alertDTO = alertDTO;
+    }
+
+    @Transient
+    private AlertDTO alertDTO;
+
     public Long getId() {
         return id;
     }

@@ -32,7 +32,15 @@ public class StockScheduler {
 
         List<Stock> stocks = stockService.getStocks();
         for (Stock stock : stocks) {
-            BigDecimal price = new BigDecimal(map.get(stock.getStockSymbol()));
+            if(stock.getStockSymbol()!=null){
+                try {
+                    BigDecimal price = new BigDecimal(map.get(stock.getStockSymbol()).trim());
+                    stock.setPreviousPrice(stock.getCurrentPrice());
+                    stock.setCurrentPrice(price);
+                }
+                catch(Exception e){
+                    System.out.println("Error for : '"+map.get(stock.getStockSymbol()) + "' Exception e :"+e);
+                    }
 //            if(stock.isOwn()){
 //                if(price.compareTo(stock.getCurrentPrice())>0){
 //                    stock.setPreviousPrice(stock.getCurrentPrice());
@@ -44,8 +52,9 @@ public class StockScheduler {
 //                    stock.setCurrentPrice(price);
 //                }
 //            }
-            stock.setPreviousPrice(stock.getCurrentPrice());
-            stock.setCurrentPrice(price);
+
+            }
+
 
         }
         stockService.updateAll(stocks);

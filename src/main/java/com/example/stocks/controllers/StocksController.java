@@ -11,6 +11,7 @@ import com.example.stocks.rules.TargetRule;
 import com.example.stocks.services.AlertService;
 import com.example.stocks.services.EmailService;
 import com.example.stocks.services.StockService;
+import jakarta.transaction.Transactional;
 import org.openqa.selenium.By;
 
 import org.openqa.selenium.WebDriver;
@@ -80,13 +81,15 @@ public class StocksController {
     }
 
     @CrossOrigin(origins = "http://localhost:8100")
-    @GetMapping("/getStock")
-    public InfoDTO getStock(@RequestParam(required = true) String stockSymbol){
-        InfoDTO infoDto = stockService.getStock(stockSymbol);
+    @GetMapping("/getStock/{symbol}")
+    public InfoDTO getStock(@PathVariable(required = true) String symbol){
+        InfoDTO infoDto = stockService.getStock(symbol);
         RuleEngine.applyRules(infoDto,infoDto.getAlerts());
-        mapSymbolStock.put(stockSymbol,infoDto);
+        mapSymbolStock.put(symbol,infoDto);
         return infoDto;
     }
+
+    
 
 
     @PutMapping("/update")
@@ -100,6 +103,23 @@ public class StocksController {
     public Map<String, String> updateStockMap(String symbol, String price){
         stockSymbol_CurrentPriceMap1.put(symbol,price);
         return stockSymbol_CurrentPriceMap1;
+    }
+
+    @PatchMapping("/stockAndCreateAlert")
+    public Stock patchStock(@RequestBody Stock stock){
+        return updateStockAndCreateAlert(stock);
+    }
+
+    @Transactional
+    private Stock updateStockAndCreateAlert(Stock stock) {
+        try{
+
+            stock = stockService.update(stock);
+            alertService.createAlertFromStock(stock);
+        }catch(Exception e){
+
+        }
+        return stock;
     }
 
     public Map<String,String> mapForTesting(){
@@ -176,8 +196,9 @@ public class StocksController {
             stock=createStock(stockSymbol,price);
         }
         System.out.println(stockSymbol+" :  "+price);
-        if(stockSymbol!=null&&infoDTO!=null) {
-            stock.setCurrentPrice(new BigDecimal(price));
+
+        if(stockSymbol!=null&&infoDTO!=null&&price!=null) {
+            stock.setCurrentPrice(new BigDecimal(price.trim()));
             stockService.update(stock);
             infoDTO.setStock(stock);
             mapSymbolStock.put(stock.getStockSymbol(), infoDTO);
@@ -195,7 +216,6 @@ public class StocksController {
             String symbol = entry.getKey();
             InfoDTO infoDTO1=mapSymbolStock.get(symbol);
             if(infoDTO1!=null) {
-                infoDTO1.setAlertDTOList(null);
                 infoDTO1.setAlerts(entry.getValue());
                 RuleEngine.applyRules(infoDTO1, entry.getValue());
             }
@@ -332,7 +352,7 @@ public class StocksController {
             RuleEngine.applyRules(infoDTO,alertList);
             infoDTOList.add(infoDTO);
         }
-
+        infoDTOList=infoDTOList.stream().sorted((x,y)-> x.getStock().getStockSymbol().compareTo(y.getStock().getStockSymbol())).toList();
         return infoDTOList;
     }
 }
