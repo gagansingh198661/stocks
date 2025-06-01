@@ -1,13 +1,15 @@
 package com.example.stocks.services;
 
+import com.example.stocks.dto.AlertRequest;
 import com.example.stocks.dto.AlertType;
-import com.example.stocks.dto.CreateAlertRequest;
+
 import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
 import com.example.stocks.repository.AlertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -20,10 +22,24 @@ public class AlertService {
         return alertRepository.findAllByActive(true);
     }
 
-    public void createAlert(CreateAlertRequest request){
-        if(request.getAlertType().name().equalsIgnoreCase(AlertType.PERCENT.name())){
-            createPercentAlert(request);
+    public boolean createAlert(AlertRequest request){
+        try {
+            List<Alert> alerts = alertRepository.findAllByStocksymbolAndLowerlimit(request.getStockSymbol(),new BigDecimal(request.getTargetPrice()));
+            if(alerts.size()==0) {
+                Alert alert = new Alert();
+                alert.setAlertType(AlertType.TARGET.name());
+                alert.setStocksymbol(request.getStockSymbol());
+                alert.setLowerlimit(new BigDecimal(request.getTargetPrice()));
+                alert.setUpperlimit(new BigDecimal(request.getTargetPrice()));
+                alert.setActive(true);
+                alertRepository.save(alert);
+                return true;
+            }
+        }catch(Exception e){
+            System.out.println(e);
         }
+        return false;
+
     }
 
     public List<Alert> getAlertsByStockSymbol(String stockSymbol){
@@ -46,20 +62,7 @@ public class AlertService {
         alertRepository.saveAndFlush(alert);
     }
 
-    private boolean createPercentAlert(CreateAlertRequest request) {
-        try {
-            Alert alert = new Alert();
-            alert.setAlertType(AlertType.PERCENT.name());
-            alert.setPercent(Integer.valueOf(request.getPercent()));
-            alert.setStocksymbol(request.getStockSymbol());
-            alert.setActive(true);
-            alertRepository.save(alert);
-            return true;
-        }catch(Exception e){
-            System.out.println(e);
-        }
-        return false;
-    }
+
 
     //this alert will always be target based
     public boolean createAlertFromStock(Stock stock) {

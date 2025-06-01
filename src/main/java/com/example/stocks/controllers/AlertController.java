@@ -1,5 +1,6 @@
 package com.example.stocks.controllers;
 
+import com.example.stocks.dto.AlertRequest;
 import com.example.stocks.dto.CreateAlertRequest;
 import com.example.stocks.entity.Alert;
 import com.example.stocks.services.AlertService;
@@ -15,9 +16,9 @@ public class AlertController {
     @Autowired
     private AlertService alertService;
 
-    @CrossOrigin(origins = "http://localhost:8100")
-    @PostMapping("/alert/createAlert")
-    public HttpEntity<?> createAlert(@RequestParam CreateAlertRequest alertRequest){
+
+    @PostMapping("/alert")
+    public HttpEntity<?> createAlert(@RequestBody AlertRequest alertRequest){
         System.out.println("Alert Request : "+ alertRequest);
         try{
             alertService.createAlert(alertRequest);
