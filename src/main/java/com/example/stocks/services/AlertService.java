@@ -32,7 +32,7 @@ public class AlertService {
                 alert.setLowerlimit(new BigDecimal(request.getTargetPrice()));
                 alert.setUpperlimit(new BigDecimal(request.getTargetPrice()));
                 alert.setActive(true);
-                alertRepository.save(alert);
+                alert = alertRepository.save(alert);
                 return true;
             }
         }catch(Exception e){
@@ -91,5 +91,9 @@ public class AlertService {
             System.out.println("Error while creating alert :" + e);
         }
         return false;
+    }
+
+    public Alert getAlertById(long id){
+        return alertRepository.findById(id).get();
     }
 }

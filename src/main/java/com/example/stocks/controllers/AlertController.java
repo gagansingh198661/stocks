@@ -18,22 +18,32 @@ public class AlertController {
 
 
     @PostMapping("/alert")
-    public HttpEntity<?> createAlert(@RequestBody AlertRequest alertRequest){
+    public Boolean createAlert(@RequestBody AlertRequest alertRequest){
         System.out.println("Alert Request : "+ alertRequest);
         try{
-            alertService.createAlert(alertRequest);
-            return new HttpEntity<>(HttpStatus.CREATED);
+            return alertService.createAlert(alertRequest);
         }catch(Exception e){
-            return new HttpEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return false;
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:8100")
     @DeleteMapping("/alert/{id}")
     public Boolean deleteAlert(@PathVariable Long id){
         System.out.println("Delete alert : "+ id);
         try{
             alertService.deleteAlert(id);
+            return true;
+        }catch(Exception e){
+            return false;
+        }
+    }
+
+    @PatchMapping("/alert/{id}/{state}")
+    public Boolean toggleAlert(@PathVariable Long id,@PathVariable Boolean state){
+        try{
+            Alert alert = alertService.getAlertById(id);
+            alert.setActive(state);
+            alertService.updateAlert(alert);
             return true;
         }catch(Exception e){
             return false;

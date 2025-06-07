@@ -115,7 +115,7 @@ public class StocksController {
         try{
 
             stock = stockService.update(stock);
-            alertService.createAlertFromStock(stock);
+           // alertService.createAlertFromStock(stock);
         }catch(Exception e){
 
         }
