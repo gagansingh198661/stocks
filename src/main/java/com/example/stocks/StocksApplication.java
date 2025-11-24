@@ -15,8 +15,7 @@ public class StocksApplication {
 
 
 	public static void main(String[] args) {
-		//SpringApplication.run(StocksApplication.class, args);
-
+		SpringApplication.run(StocksApplication.class, args);
 	}
 
 

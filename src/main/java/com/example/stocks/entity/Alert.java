@@ -31,17 +31,6 @@ public class Alert {
     @Column(name = "alerttype")
     private String alertType;
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @Column(name= "type")
-    private String type;
-
     public AlertDTO getAlertDTO() {
         return alertDTO;
     }
