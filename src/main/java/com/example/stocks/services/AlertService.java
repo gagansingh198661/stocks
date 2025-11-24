@@ -6,6 +6,7 @@ import com.example.stocks.dto.AlertType;
 import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
 import com.example.stocks.repository.AlertRepository;
+import com.example.stocks.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,9 @@ public class AlertService {
     @Autowired
     private AlertRepository alertRepository;
 
+    @Autowired
+    private StockRepository stockRepository;
+
     public List<Alert> getAlerts(){
         return alertRepository.findAllByActive(true);
     }
@@ -25,6 +29,14 @@ public class AlertService {
     public boolean createAlert(AlertRequest request){
         try {
             List<Alert> alerts = alertRepository.findAllByStocksymbolAndLowerlimit(request.getStockSymbol(),new BigDecimal(request.getTargetPrice()));
+            Stock stock =stockRepository.findByStockSymbol(request.getStockSymbol());
+            BigDecimal currentPrice = stock.getCurrentPrice();
+            String type="";
+            if(currentPrice.compareTo(new BigDecimal(request.getTargetPrice()))>0){
+                type="Decrease";
+            }else{
+                type="Increase";
+            }
             if(alerts.size()==0) {
                 Alert alert = new Alert();
                 alert.setAlertType(AlertType.TARGET.name());
@@ -32,6 +44,7 @@ public class AlertService {
                 alert.setLowerlimit(new BigDecimal(request.getTargetPrice()));
                 alert.setUpperlimit(new BigDecimal(request.getTargetPrice()));
                 alert.setActive(true);
+                alert.setType(type);
                 alert = alertRepository.save(alert);
                 return true;
             }
