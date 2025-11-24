@@ -19,15 +19,19 @@ public class TargetRule implements Rule{
             List<Alert> alerts= infoDTO.getAlerts();
             if(alerts!=null&&alerts.size()>0) {
                 for (Alert alert : alerts) {
-                    if (alert.getAlertType().equals(AlertType.TARGET.name())) {
+                    if (alert.getAlertType().equals(AlertType.TARGET.name())&&alert.isActive()) {
                         if(alert.getLowerlimit()!=null&&currentPrice!=null) {
-                            if (currentPrice.longValue() >= alert.getLowerlimit().longValue()&&infoDTO.getStock().isOwn()) {
-                                AlertDTO alertDTO = new AlertDTO("Target Price reached : " + infoDTO.getStock().getStockSymbol(), currentPrice.toPlainString(), alert.getLowerlimit().toString(), Action.SELL, Type.IMPORTANT);
-                                alert.setAlertDTO(alertDTO);
-                            } else if (currentPrice.longValue() <= alert.getLowerlimit().longValue()) {
-                                AlertDTO alertDTO = new AlertDTO("Target Price reached : " + infoDTO.getStock().getStockSymbol(), currentPrice.toPlainString(), alert.getLowerlimit().toString(), Action.BUY, Type.IMPORTANT);
-                                alert.setAlertDTO(alertDTO);
+                            if(alert.getType()!=null){
+                                if (alert.getType().equals("Increase")&&currentPrice.doubleValue() >= alert.getLowerlimit().doubleValue()) {
+                                    AlertDTO alertDTO = new AlertDTO("Target Price reached : " + alert.getLowerlimit().doubleValue(), currentPrice.toPlainString(), alert.getLowerlimit().toString(), Action.SELL, Type.IMPORTANT);
+                                    alert.setAlertDTO(alertDTO);
+                                }
+                                else if (alert.getType().equals("Decrease")&&currentPrice.doubleValue() <= alert.getLowerlimit().doubleValue()) {
+                                    AlertDTO alertDTO = new AlertDTO("Target Price reached : " + alert.getLowerlimit().doubleValue(), currentPrice.toPlainString(), alert.getLowerlimit().toString(), Action.BUY, Type.IMPORTANT);
+                                    alert.setAlertDTO(alertDTO);
+                                }
                             }
+
                         }
                     }
                 }

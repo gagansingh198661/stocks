@@ -1,8 +1,13 @@
 package com.example.stocks.controllers;
 
+
 import com.example.stocks.dto.InfoDTO;
+import com.example.stocks.dto.UpdateTokenRequest;
 import com.example.stocks.entity.Alert;
 import com.example.stocks.entity.Stock;
+import com.example.stocks.firebase.dto.NotificationRequest;
+
+import com.example.stocks.firebase.service.FCMService;
 import com.example.stocks.ruleEngine.RuleEngine;
 import com.example.stocks.rules.BuyMoreRule;
 import com.example.stocks.rules.PercentRule;
@@ -18,6 +23,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedWriter;
@@ -29,6 +38,7 @@ import java.net.Socket;
 import java.util.*;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,6 +65,23 @@ public class StocksController {
     static Map<String, InfoDTO> mapSymbolStock= new ConcurrentHashMap<>();
 
     Map<String,String> stockSymbol_CurrentPriceMap1 = new HashMap<>();
+
+    @Autowired
+    private FCMService fcmService;
+
+    @PostMapping(value="/notification", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<?> sendNotification(@RequestBody NotificationRequest request) throws ExecutionException, InterruptedException, ExecutionException {
+        fcmService.sendMessageToToken(request);
+        return new HttpEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(value="/updateToken")
+    public HttpEntity<?> updateToken(@RequestBody UpdateTokenRequest token) throws ExecutionException, InterruptedException, ExecutionException {
+        fcmService.updateToken(token);
+        return new HttpEntity<>(HttpStatus.OK);
+    }
+
+
 
     @GetMapping("/generateData")
     public void generateData(){
@@ -89,7 +116,7 @@ public class StocksController {
         return infoDto;
     }
 
-    
+
 
 
     @PutMapping("/update")
@@ -115,7 +142,7 @@ public class StocksController {
         try{
 
             stock = stockService.update(stock);
-           // alertService.createAlertFromStock(stock);
+            // alertService.createAlertFromStock(stock);
         }catch(Exception e){
 
         }
@@ -163,12 +190,12 @@ public class StocksController {
         Map<String,Stock> stockSymbol_Stock_Map =  new HashMap<>();
         stocksList.forEach( it-> stockSymbol_Stock_Map.put(it.getStockSymbol(),it));
         for(Map.Entry<String,String> entry:stockSymbolURLMap.entrySet()){
-           String url = entry.getValue();
-           if(isConnectedToInternet()){
-               String price = getCurrentValue(url);
-               stockSymbol_CurrentPriceMap.put(entry.getKey(),price);
-               updateResponseMap(entry.getKey(),price,stockSymbol_Stock_Map.get(entry.getKey()));
-           }
+            String url = entry.getValue();
+            if(isConnectedToInternet()){
+                String price = getCurrentValue(url);
+                stockSymbol_CurrentPriceMap.put(entry.getKey(),price);
+                updateResponseMap(entry.getKey(),price,stockSymbol_Stock_Map.get(entry.getKey()));
+            }
         }
         return stockSymbol_CurrentPriceMap;
 
@@ -195,9 +222,9 @@ public class StocksController {
             System.out.println("Stock : "+stockSymbol);
             stock=createStock(stockSymbol,price);
         }
-        System.out.println(stockSymbol+" :  "+price);
+        System.out.println(stockSymbol+" :  "+"'"+price+"'");
 
-        if(stockSymbol!=null&&infoDTO!=null&&price!=null) {
+        if(stockSymbol!=null&&infoDTO!=null&&price!=null&&!price.equals("")) {
             stock.setCurrentPrice(new BigDecimal(price.trim()));
             stockService.update(stock);
             infoDTO.setStock(stock);
@@ -255,7 +282,7 @@ public class StocksController {
             driver.get(url);
             List<WebElement>  spanElements = driver.findElements(By.tagName("span"));
             for (WebElement element:
-                 spanElements) {
+                    spanElements) {
                 String value = element.getAttribute("data-testid");
                 if(value!=null){
                     String price = element.getAttribute("innerHTML");
@@ -328,7 +355,7 @@ public class StocksController {
         return urlList;
     }
 
-    private List<InfoDTO> createInfoDTOList(){
+    public List<InfoDTO> createInfoDTOList(){
         List<Stock> stockList =stockService.getStocks();
         List<InfoDTO> infoDTOList = new LinkedList<>();
         List<Alert> alerts = alertService.getAlerts();
@@ -347,12 +374,24 @@ public class StocksController {
             infoDTO.setStock(stock);
             List<Alert> alertList = mapSymbolAlertList.get(stock.getStockSymbol());
             infoDTO.setAlerts(alertList);
-            if(RuleEngine.getsize()==0)
-            RuleEngine.setRuleList(addRules());
-            RuleEngine.applyRules(infoDTO,alertList);
+
             infoDTOList.add(infoDTO);
         }
         infoDTOList=infoDTOList.stream().sorted((x,y)-> x.getStock().getStockSymbol().compareTo(y.getStock().getStockSymbol())).toList();
+        return infoDTOList;
+    }
+
+    public List<InfoDTO> getNotifications(){
+        List<InfoDTO> infoDTOList = createInfoDTOList();
+        return processNotifications(infoDTOList);
+    }
+    private List<InfoDTO> processNotifications(List<InfoDTO> infoDTOList){
+        for(InfoDTO infoDTO : infoDTOList) {
+            List<Alert> alertList=infoDTO.getAlerts();
+            if (RuleEngine.getsize() == 0)
+                RuleEngine.setRuleList(addRules());
+            RuleEngine.applyRules(infoDTO, alertList);
+        }
         return infoDTOList;
     }
 }
