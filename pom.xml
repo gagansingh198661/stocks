@@ -71,7 +71,28 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+
+		<!-- Maven -->
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>9.3.0</version>  <!-- Latest as of November 2025 -->
+		</dependency>
+
 	</dependencies>
+
+
+
+	<repositories>
+		<repository>
+			<id>google</id>
+			<url>https://maven.google.com/</url>
+		</repository>
+		<repository>
+			<id>central</id>
+			<url>https://repo.maven.apache.org/maven2</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
